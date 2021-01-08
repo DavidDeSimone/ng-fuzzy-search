@@ -1,4 +1,4 @@
-import { fuzzyMatch } from "./fuzzy-search.js#7";
+import { fuzzyMatch } from "https://deno.land/x/fuzzy_search@0.1.0/fuzzy-search.js";
 import { walk, walkSync } from "https://deno.land/std@0.83.0/fs/mod.ts";
 
 self.onmessage = (data) => {

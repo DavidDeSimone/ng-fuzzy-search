@@ -1,6 +1,3 @@
-import { fuzzyMatch } from "./fuzzy-search.js#6";
-import { walk, walkSync } from "https://deno.land/std@0.83.0/fs/mod.ts";
-
 const TEXT_COLOR = "green";
 let BASEDIR = './';
 
