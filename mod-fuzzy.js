@@ -1,5 +1,6 @@
 const TEXT_COLOR = "green";
 let BASEDIR = './';
+let MAX_RESULTS = 50;
 
 let workerActive = false;
 let msgId = 0;
@@ -32,6 +33,10 @@ export function setFuzzySearchDirectory(dir) {
     BASEDIR = dir;
 }
 
+export function setFuzzySearchMaxResults(n) {
+    MAX_RESULTS = n;
+}
+
 lisp.defun({
     name: "fuzzy-search-set-basedir",
     interactive: true,
@@ -41,8 +46,15 @@ lisp.defun({
     }
 });
 
+lisp.defun({
+    name: "fuzzy-search-set-max-results",
+    interactive: true,
+    args: "nNew Value ",
+    func: (n) => { setFuzzySearchMaxResults(n) }
+});
+
 const setTextColor = (min, max, strSymbol, color) => {
-    lisp.add_text_properties(min, max, lisp.list(lisp.q.font_lock_face,
+    return lisp.add_text_properties(min, max, lisp.list(lisp.q.font_lock_face,
 						 lisp.list(lisp.keywords.foreground,
 							   color)), strSymbol);
 };
@@ -80,9 +92,14 @@ lisp.defun({
     func: (str) => {
 	fuzzySearchAsync(str)
 	    .then((results) => {
+		// falling back due to older version of emacs-ng
+		const makeString = lisp.make.string || lisp_string;
+		const currentBuffer = lisp.current_buffer();
 		const resultBuffer = lisp.get_buffer_create('*Fuzzy Search*');
-		lisp.set_buffer(resultBuffer);
-		lisp.switch_to_buffer_other_window(resultBuffer);
+		if (!lisp.eq(resultBuffer, currentBuffer)) {
+		    lisp.switch_to_buffer_other_window(resultBuffer);
+		}
+
 		lisp.tabulated_list_mode();
 		lisp.fuzzy_mode();
 		
@@ -92,10 +109,10 @@ lisp.defun({
 		lisp.setq(lisp.symbols.tabulated_list_format, lisp.make.array([columns]));
 		const filtered = [];
 		let b = null;
-		for (let i = 0; i < Math.min(50, results.length); ++i) {
+		for (let i = 0; i < Math.min(MAX_RESULTS, results.length); ++i) {
 		    let name = results[i][0].path;
 		    let idxs = results[i][2];
-		    const str = lisp.setq(lisp.q.str, name);
+		    const str = makeString(name);
 		    
 		    let currentRange = idxs[0];
 		    for (let i = 0; i < idxs.length; ++i) {
