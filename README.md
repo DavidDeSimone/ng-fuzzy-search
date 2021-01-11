@@ -11,5 +11,5 @@ This will fuzzy-search for a pattern. By default, it will use the current direct
 To use with emacs-ng, just include this line in your init.el:
 
 ```lisp
-(eval-js "import 'https://deno.land/x/fuzzy_search@0.1.0/mod-fuzzy.js'")
+(eval-js "import 'https://deno.land/x/fuzzy_search@0.2.0/mod-fuzzy.js'")
 ```
