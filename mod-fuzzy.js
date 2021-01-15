@@ -14,18 +14,24 @@ export function fuzzySearchAsync(pattern, dir = BASEDIR) {
 				    type: "module",
 				    deno: true,
 				});
-	
+
 	worker.onmessage = function (result) {
-	    const { responseMsgId, rank } = result.data;
-	    pendingPromises[responseMsgId](rank);
+	    const { responseMsgId, rank, error } = result.data;
+	    const promise = pendingPromises[responseMsgId];
+	    if (error) {
+		promise.reject(JSON.stringify(error));
+		return;
+	    }
+
+	    promise.resolve(rank);
 	    pendingPromises[responseMsgId] = null;
 	}
     }
 
     return new Promise((resolve, reject) => {
 	msgId += 1;
-	pendingPromises[msgId] = resolve;
-	worker.postMessage({ msgId, pattern, dir });
+	pendingPromises[msgId] = {resolve, reject};
+	worker.postMessage({ msgId, pattern, dir  });
     });
 }
 
@@ -88,7 +94,7 @@ lisp.define_minor_mode(lisp.symbols.fuzzy_mode,
 lisp.defun({
     name: "fuzzy-search",
     interactive: true,
-    args: "MInput >>",
+    args: "MInput >> ",
     func: (str) => {
 	fuzzySearchAsync(str)
 	    .then((results) => {
