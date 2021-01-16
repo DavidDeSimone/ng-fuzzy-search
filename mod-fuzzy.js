@@ -19,7 +19,7 @@ export function fuzzySearchAsync(pattern, dir = BASEDIR) {
 	    const { responseMsgId, rank, error } = result.data;
 	    const promise = pendingPromises[responseMsgId];
 	    if (error) {
-		promise.reject(JSON.stringify(error));
+		promise.reject(error);
 		return;
 	    }
 
@@ -74,7 +74,7 @@ lisp.defun({
 	lisp.find_file(lisp.buffer_substring(s, e));
     }
 });
-    
+
 
 lisp.defvar(lisp.symbols.fuzzy_mode_keymap,
 	    lisp.make_keymap(),
@@ -108,7 +108,7 @@ lisp.defun({
 
 		lisp.tabulated_list_mode();
 		lisp.fuzzy_mode();
-		
+
 		const columns = lisp.make.list(
 		    [`Results for "${str}"; Base Directory ${BASEDIR}`, 0, lisp.q.nil],
 		);
@@ -119,21 +119,21 @@ lisp.defun({
 		    let name = results[i][0].path;
 		    let idxs = results[i][2];
 		    const str = makeString(name);
-		    
+
 		    let currentRange = idxs[0];
-		    for (let i = 0; i < idxs.length; ++i) {
-			if (i === idxs.length - 1) {
-			    setTextColor(currentRange, idxs[i] + 1, str, TEXT_COLOR);
-			} else if (idxs[i + 1] - idxs[i] !== 1) {
-			    setTextColor(currentRange, idxs[i] + 1, str, TEXT_COLOR);
-			    currentRange = idxs[i + 1];
+		    for (let j = 0; j < idxs.length; ++j) {
+			if (j === idxs.length - 1) {
+			    setTextColor(currentRange, idxs[j] + 1, str, TEXT_COLOR);
+			} else if (idxs[j + 1] - idxs[j] !== 1) {
+			    setTextColor(currentRange, idxs[j] + 1, str, TEXT_COLOR);
+			    currentRange = idxs[j + 1];
 			}
 		    }
 
 		    let namevec = lisp.make.array([str]);
 		    filtered.push(lisp.make.list([lisp.q.nil, namevec]));
 		}
-		
+
 		const data = lisp.list(...filtered);
 		lisp.setq(lisp.symbols.tabulated_list_entries, data);
 		lisp.tabulated_list_init_header();

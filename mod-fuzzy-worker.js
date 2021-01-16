@@ -1,4 +1,4 @@
-import { fuzzyMatch } from "https://deno.land/x/fuzzy_search@0.1.0/fuzzy-search.js";
+import { fuzzyMatch } from "https://deno.land/x/fuzzy_search@0.3.0/fuzzy-search.js";
 import { walk, walkSync } from "https://deno.land/std@0.83.0/fs/mod.ts";
 
 const find = (data) => {
@@ -39,6 +39,6 @@ self.onmessage = (data) => {
 	const msg = find(data);
 	self.postMessage(msg);
     } catch (error) {
-	self.postMessage({ responseMsgId: data.data.msgId, error });
+	self.postMessage({ responseMsgId: data.data.msgId, error: JSON.stringify(error) });
     }
 };

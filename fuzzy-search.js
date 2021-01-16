@@ -176,9 +176,10 @@ function fuzzyMatchRecursive(
 	// Return best result
 	if (recursiveMatch && (!matched || bestRecursiveScore > outScore)) {
 	    // Recursive score is better than "this"
+	    const found = bestRecursiveMatches.length > 0 ? [...bestRecursiveMatches] : matches;
 	    matches = [...bestRecursiveMatches];
 	    outScore = bestRecursiveScore;
-	    return [true, outScore, matches, strCurrIndex, patternCurIndex];
+	    return [true, outScore, found, strCurrIndex, patternCurIndex];
 	} else if (matched) {
 	    // "this" score is better than recursive
 	    return [true, outScore, matches, strCurrIndex, patternCurIndex];
@@ -186,5 +187,5 @@ function fuzzyMatchRecursive(
 	    return [false, outScore];
 	}
     }
-    return [false, outScore, matches];
+    return [false, outScore];
 }
